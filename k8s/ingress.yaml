@@ -2,8 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: health-service
+  namespace: health-service
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /health
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
@@ -17,8 +19,8 @@ spec:
                 name: health-service
                 port:
                   number: 8000
-          - path: /otusapp/andrey7x7/health
-            pathType: Prefix
+          - path: /otusapp/.*/health
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: health-service
