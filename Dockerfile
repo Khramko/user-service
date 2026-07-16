@@ -1,13 +1,15 @@
 FROM eclipse-temurin:17-jdk-alpine
 
-# Устанавливаем рабочую директорию
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 WORKDIR /app
 
-# Копируем jar файл
 COPY target/health-service-0.0.2-SNAPSHOT.jar app.jar
 
-# Открываем порт
+RUN chown appuser:appgroup app.jar
+
+USER appuser
+
 EXPOSE 8000
 
-# Запускаем приложение
 ENTRYPOINT ["java", "-jar", "app.jar"]
