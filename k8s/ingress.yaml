@@ -4,7 +4,6 @@ metadata:
   name: health-service
   namespace: health-service
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /health
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
@@ -20,6 +19,13 @@ spec:
                 port:
                   number: 8000
           - path: /otusapp/.*/health
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: health-service
+                port:
+                  number: 8000
+          - path: /api/.*
             pathType: ImplementationSpecific
             backend:
               service:

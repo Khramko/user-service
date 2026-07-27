@@ -21,7 +21,7 @@ spec:
         app: health-service
     spec:
       containers:
-        - name: health-servi
+        - name: health-service
           image: andrey7x7/service-health:0.0.2
           imagePullPolicy: Always
           ports:
@@ -30,6 +30,31 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "k8s"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_PASSWORD
           livenessProbe:
             httpGet:
               path: /health
@@ -48,8 +73,8 @@ spec:
             failureThreshold: 5
           resources:
             requests:
-              memory: "512Mi"          # Увеличено
+              memory: "512Mi"
               cpu: "250m"
             limits:
-              memory: "1Gi"            # Увеличено
+              memory: "1Gi"
               cpu: "500m"

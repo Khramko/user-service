@@ -1,0 +1,21 @@
+auth:
+  postgresPassword: "rootpassword123"   # Пароль для администратора postgres
+  username: "app_user"                  # Пользователь приложения
+  password: "securePassword123"         # Пароль пользователя
+  database: "app_db"                    # Имя базы данных
+
+primary:
+  persistence:
+    enabled: true
+    size: 1Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+
+service:
+  type: ClusterIP
+  port: 5432
