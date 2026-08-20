@@ -122,55 +122,75 @@ helm version
  Settings → Kubernetes → Enable Kubernetes → Apply & Restart
 
  Проверка кластера
+
 kubectl cluster-info
+
 kubectl get nodes
 
 Установка Ingress Controller
  Добавление репозитория
+
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
 helm repo update
 
  Установка Ingress Controller
+
 helm install nginx-ingress ingress-nginx/ingress-nginx `
+
   -n ingress-nginx `
+
   --create-namespace
 
  Проверка
+
 kubectl get pods -n ingress-nginx
+
 kubectl get svc -n ingress-nginx
 
 
-Установка PostgreSQL
-Установка PostgreSQL через Helm
-helm install postgres-test oci://registry-1.docker.io/bitnamicharts/postgresql `
-  -n health-service `
-  --create-namespace `
-  -f values.yaml
 
-Ожидание готовности
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=postgres-test-postgresql `
-  -n health-service --timeout=120s
+Установка PostgreSQL через Helm
+
+helm install postgres-test oci://registry-1.docker.io/bitnamicharts/postgresql `
+  
+-n health-service `
+  
+--create-namespace `
+  
+-f values.yaml
 
 Проверка
+
 kubectl get pods -n health-service
 
 Развертывание приложения
 Применение всех манифестов
+
 kubectl apply -f k8s/
 
 Или по порядку:
+
 kubectl apply -f k8s/namespace.yaml
+
 kubectl apply -f k8s/configmap.yaml
+
 kubectl apply -f k8s/secret.yaml
+
 kubectl apply -f k8s/service.yaml
+
 kubectl apply -f k8s/job-migration.yaml
+
 kubectl apply -f k8s/deployment.yaml
+
 kubectl apply -f k8s/ingress.yaml
 
 Проверка статуса миграции
+
 kubectl logs -n health-service job/db-migration
 
 Проверка таблиц в БД
+
 kubectl exec -n health-service pod/postgres-test-postgresql-0 -- `
   env PGPASSWORD=securePassword123 psql -U app_user -d app_db -c "\dt"
 
@@ -179,6 +199,7 @@ kubectl exec -n health-service pod/postgres-test-postgresql-0 -- `
 
 Вариант А: Через NodePort
 Получите NodePort
+
 $NODE_PORT = kubectl get svc -n ingress-nginx nginx-ingress-ingress-nginx-controller `
   -o jsonpath="{.spec.ports[0].nodePort}"
 
@@ -187,8 +208,10 @@ Write-Host "Доступ: http://arch.homework:$NODE_PORT/health" -ForegroundCol
 
 Вариант Б: Через Port-Forward
 В ОТДЕЛЬНОМ терминале
+
 kubectl port-forward -n ingress-nginx svc/nginx-ingress-ingress-nginx-controller 80:80
- Настройка hosts файла
+ 
+Настройка hosts файла
  Добавьте в C:\Windows\System32\drivers\etc\hosts:
  127.0.0.1 arch.homework
 
