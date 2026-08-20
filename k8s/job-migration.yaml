@@ -8,13 +8,24 @@ metadata:
     "helm.sh/hook-weight": "5"
 spec:
   ttlSecondsAfterFinished: 100
+  activeDeadlineSeconds: 300
+  backoffLimit: 2
   template:
     spec:
       restartPolicy: OnFailure
       containers:
         - name: migration
           image: andrey7x7/service-health:0.0.2
-          command: ["java", "-jar", "app.jar", "--spring.liquibase.enabled=true", "--spring.batch.job.enabled=false"]
+          # ГЛАВНОЕ ИЗМЕНЕНИЕ - запускаем только миграции и выходим
+          command:
+            - "java"
+            - "-jar"
+            - "app.jar"
+            - "--spring.liquibase.enabled=true"
+            - "--spring.batch.job.enabled=false"
+            - "--spring.main.web-application-type=none"
+            - "--spring.job.enabled=false"
+            - "--spring.sql.init.mode=never"
           env:
             - name: DB_HOST
               valueFrom:
