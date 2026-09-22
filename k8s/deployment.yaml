@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: health-service
-          image: andrey7x7/service-health:0.0.2
+          image: andrey7x7/service-health:0.0.3
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

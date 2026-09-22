@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: health-service
+  namespace: health-service
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: health-service
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s

@@ -15,7 +15,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: migration
-          image: andrey7x7/service-health:0.0.2
+          image: andrey7x7/service-health:0.0.3
           # ГЛАВНОЕ ИЗМЕНЕНИЕ - запускаем только миграции и выходим
           command:
             - "java"

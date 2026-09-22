@@ -1,0 +1,14 @@
+config:
+  datasource:
+    host: "postgres-test-postgresql.health-service.svc.cluster.local" # DNS-имя вашей БД из вывода Helm
+    user: "app_user"
+    password: "securePassword123" # Пароль, который вы задавали
+    port: "5432"
+    database: "app_db"
+    sslmode: "disable"
+
+serviceMonitor:
+  enabled: true
+  namespace: monitoring # Namespace, где живёт Prometheus Operator
+  labels:
+    release: prometheus # Метка, которую ждёт Prometheus Operator

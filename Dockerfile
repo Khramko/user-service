@@ -4,7 +4,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
-COPY target/health-service-0.0.2-SNAPSHOT.jar app.jar
+COPY target/health-service-0.0.3-SNAPSHOT.jar app.jar
 
 RUN chown appuser:appgroup app.jar
 
