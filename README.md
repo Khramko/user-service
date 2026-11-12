@@ -63,7 +63,44 @@ graph TB
     PGExp --> DB
     Graf --> Prom
 ```
+### Поток аутентификации и доступа к профилю
 
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant I as Ingress (nginx)
+    participant S as health-service
+    participant DB as PostgreSQL
+
+    Note over C,DB: Регистрация
+    C->>I: POST /auth/register {name, email, password}
+    I->>S: proxy
+    S->>S: BCrypt encode password
+    S->>DB: INSERT user
+    DB-->>S: id
+    S->>S: generate JWT (sub=email)
+    S-->>C: 201 {id, token}
+
+    Note over C,DB: Вход
+    C->>I: POST /auth/login {email, password}
+    I->>S: proxy
+    S->>DB: SELECT user by email
+    S->>S: BCrypt matches + generate JWT
+    S-->>C: 200 {id, token}
+
+    Note over C,DB: Доступ к своему профилю
+    C->>I: GET /api/profile (Bearer JWT)
+    I->>S: proxy
+    S->>S: JwtAuthenticationFilter → SecurityContext
+    S-->>C: 200 {id, name, email}
+
+    Note over C,DB: Доступ к чужому профилю
+    C->>I: GET /api/profile/{otherId} (Bearer JWT)
+    I->>S: proxy
+    S->>S: @PreAuthorize("#id == principal.id") → false
+    S-->>C: 403 {"error":"forbidden"}
+```
 ## Поток данных
 ```mermaid
 sequenceDiagram
@@ -368,7 +405,7 @@ kubectl port-forward -n ingress-nginx svc/nginx-ingress-ingress-nginx-controller
 
 ## API Эндпоинты
 
-Коллекция Postman находится в директории `ets/collection.json`.
+Коллекция Postman находится в директории `etc/collection.json`.
 
 | Метод | Путь | Описание |
 |---|---|---|
@@ -379,3 +416,22 @@ kubectl port-forward -n ingress-nginx svc/nginx-ingress-ingress-nginx-controller
 | GET | `/api/users/{id}` | Получить пользователя |
 | PUT | `/api/users/{id}` | Обновить пользователя |
 | DELETE | `/api/users/{id}` | Удалить пользователя |
+
+
+Актуальная коллекция Postman для проверки сценария аутентификации и профиля:
+
+- 📄 [`etc/auth-profile-tests.postman_collection.json`](etc/auth-profile-tests.postman_collection.json)
+  — 11 запросов, покрывает регистрацию, логин, изоляцию профиля (чтение и редактирование).
+
+Дополнительная коллекция с CRUD пользователей (legacy):
+
+- 📄 [`etc/collection.json`](etc/collection.json)
+
+Запуск через Newman:
+
+```bash
+newman run etc/auth-profile-tests.postman_collection.json \
+  --env-var "baseUrl=http://arch.homework:8080"
+> **Logout:** не реализован на бэкенде, т.к. используется stateless JWT.
+> Клиент удаляет токен локально (из localStorage/памяти) — этого достаточно
+> для завершения сессии.

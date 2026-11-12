@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: health-service
-          image: andrey7x7/service-health:0.0.4
+          image: andrey7x7/service-health:0.0.5
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -55,6 +55,11 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: DB_PASSWORD
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_SECRET_KEY
           livenessProbe:
             httpGet:
               path: /health

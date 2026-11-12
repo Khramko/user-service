@@ -1,0 +1,500 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Auth and Profile Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Register User 1",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const randomName = 'user_' + Math.random().toString(36).substring(2, 10);",
+              "const randomEmail = randomName + '@example.com';",
+              "pm.collectionVariables.set('randomName', randomName);",
+              "pm.collectionVariables.set('randomEmail', randomEmail);",
+              "pm.collectionVariables.set('randomPassword', 'password123');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Response contains id', function () {",
+              "    pm.expect(jsonData.id).to.be.a('number');",
+              "});",
+              "pm.collectionVariables.set('user1_id', jsonData.id);",
+              "pm.collectionVariables.set('user1_token', jsonData.token);",
+              "pm.collectionVariables.set('user1_email', pm.collectionVariables.get('randomEmail'));",
+              "pm.collectionVariables.set('user1_password', 'password123');",
+              "console.log('User 1 registered with id=' + jsonData.id + ', email=' + pm.collectionVariables.get('user1_email'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"{{randomName}}\",\n    \"email\": \"{{randomEmail}}\",\n    \"password\": \"{{randomPassword}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Try to get profile without login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Try to update profile without login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Hacker\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Login User 1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Login response contains same id as registration', function () {",
+              "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get('user1_id'));",
+              "});",
+              "pm.collectionVariables.set('user1_token', jsonData.token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"{{user1_email}}\",\n    \"password\": \"{{user1_password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Get User 1 profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "console.log('AUTH:', pm.request.headers.get('Authorization'));",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Profile name matches registered name', function () {",
+              "    pm.expect(jsonData.name).to.eql(pm.collectionVariables.get('randomName'));",
+              "});",
+              "pm.test('Profile id matches registration id', function () {",
+              "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get('user1_id'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{user1_token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Update User 1 profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.collectionVariables.set('updatedName', 'Updated User One');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{user1_token}}", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Updated User One\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7. Verify User 1 profile is updated",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "console.log('AUTH:', pm.request.headers.get('Authorization'));",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Profile name matches updated name', function () {",
+              "    pm.expect(jsonData.name).to.eql(pm.collectionVariables.get('updatedName'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{user1_token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Register User 2",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const randomName = 'user2_' + Math.random().toString(36).substring(2, 10);",
+              "const randomEmail = randomName + '@example.com';",
+              "pm.collectionVariables.set('randomName2', randomName);",
+              "pm.collectionVariables.set('randomEmail2', randomEmail);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Response contains id', function () {",
+              "    pm.expect(jsonData.id).to.be.a('number');",
+              "});",
+              "pm.collectionVariables.set('user2_id', jsonData.id);",
+              "pm.collectionVariables.set('user2_token', jsonData.token);",
+              "pm.collectionVariables.set('user2_email', pm.collectionVariables.get('randomEmail2'));",
+              "pm.collectionVariables.set('user2_password', 'password456');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"{{randomName2}}\",\n    \"email\": \"{{randomEmail2}}\",\n    \"password\": \"password456\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "register"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9. Login User 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.test('Login response contains same id as registration', function () {",
+              "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get('user2_id'));",
+              "});",
+              "pm.collectionVariables.set('user2_token', jsonData.token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"{{user2_email}}\",\n    \"password\": \"{{user2_password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. Try to access User 1 profile as User 2 (should fail)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "console.log('AUTH (user2):', pm.request.headers.get('Authorization'));",
+              "console.log('TARGET user1_id:', pm.collectionVariables.get('user1_id'));",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.response.to.have.status(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{user2_token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile/{{user1_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile", "{{user1_id}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11. Try to update User 1 profile as User 2 (should fail)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "console.log('=== REQUEST ===');",
+              "console.log(pm.request.method, pm.request.url.toString());",
+              "if (pm.request.body && pm.request.body.raw) console.log('BODY:', pm.request.body.raw);",
+              "console.log('AUTH (user2):', pm.request.headers.get('Authorization'));",
+              "console.log('TARGET user1_id:', pm.collectionVariables.get('user1_id'));",
+              "console.log('=== RESPONSE ===');",
+              "console.log('STATUS:', pm.response.code);",
+              "console.log('BODY:', pm.response.text());",
+              "",
+              "pm.test('Status code is 403 Forbidden', function () {",
+              "    pm.response.to.have.status(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{user2_token}}", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Hacked by User 2\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/profile/{{user1_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "profile", "{{user1_id}}"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": { "type": "text/javascript", "exec": [""] }
+    },
+    {
+      "listen": "test",
+      "script": { "type": "text/javascript", "exec": [""] }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://arch.homework",
+      "type": "default"
+    }
+  ]
+}

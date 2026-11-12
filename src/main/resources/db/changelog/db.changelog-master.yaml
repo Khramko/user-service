@@ -24,3 +24,22 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: true
+
+  - changeSet:
+      id: 2
+      author: andrey
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+        - sql:
+            sql: UPDATE users SET password = '$2a$10$dummyHashPlaceholderForExistingUsers000000000000000000' WHERE password IS NULL
+        - addNotNullConstraint:
+            tableName: users
+            columnName: password
+            columnDataType: VARCHAR(255)

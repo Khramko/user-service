@@ -2,13 +2,12 @@ package com.example.health_service.controller;
 
 import com.example.health_service.dto.UserDto;
 import com.example.health_service.model.User;
-import com.example.health_service.repository.UserRepository;
+import com.example.health_service.repository.IUserRepository;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +19,9 @@ public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    private final UserRepository userRepository;
+    private final IUserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
