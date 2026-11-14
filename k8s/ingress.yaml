@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: health-service
-  namespace: health-service
+  name: user-service
+  namespace: user-service
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
@@ -15,27 +15,20 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: health-service
+                name: user-service
                 port:
                   number: 8000
           - path: /otusapp/.*/health
             pathType: ImplementationSpecific
             backend:
               service:
-                name: health-service
-                port:
-                  number: 8000
-          - path: /api/.*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: health-service
+                name: user-service
                 port:
                   number: 8000
           - path: /auth/.*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: health-service
+                name: user-service
                 port:
                   number: 8000

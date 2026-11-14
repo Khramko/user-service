@@ -1,6 +1,6 @@
 config:
   datasource:
-    host: "postgres-test-postgresql.health-service.svc.cluster.local" # DNS-имя вашей БД из вывода Helm
+    host: "postgres-test-postgresql.user-service.svc.cluster.local" # DNS-имя вашей БД из вывода Helm
     user: "app_user"
     password: "securePassword123" # Пароль, который вы задавали
     port: "5432"

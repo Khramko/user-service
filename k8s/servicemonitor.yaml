@@ -1,14 +1,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: health-service
-  namespace: health-service
+  name: user-service
+  namespace: user-service
   labels:
     release: prometheus
 spec:
   selector:
     matchLabels:
-      app: health-service
+      app: user-service
   endpoints:
     - port: http
       path: /actuator/prometheus

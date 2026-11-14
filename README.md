@@ -1,4 +1,4 @@
-# Health Service
+# User Service
 
 Spring Boot микросервис для управления пользователями с интеграцией PostgreSQL, Liquibase для миграций и полным набором Kubernetes манифестов для развертывания. Включает полный стек мониторинга: Prometheus, Grafana и алертинг.
 
@@ -70,7 +70,7 @@ sequenceDiagram
     autonumber
     participant C as Client
     participant I as Ingress (nginx)
-    participant S as health-service
+    participant S as user-service
     participant DB as PostgreSQL
 
     Note over C,DB: Регистрация
@@ -199,7 +199,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack \
 kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 9090:9090
 ```
 
-Откройте `http://localhost:9090/targets` — таргет `health-service` должен быть в статусе **UP**.
+Откройте `http://localhost:9090/targets` — таргет `user-service` должен быть в статусе **UP**.
 
 ### Доступ к Grafana
 
@@ -216,7 +216,7 @@ kubectl get secret prometheus-grafana -n monitoring -o jsonpath="{.data.admin-pa
 
 ### Импорт дашборда
 
-Дашборд находится в файле `health-service-dashboard.json`. Импортируйте его через **Dashboards → New → Import → Upload JSON file**.
+Дашборд находится в файле `user-service-dashboard.json`. Импортируйте его через **Dashboards → New → Import → Upload JSON file**.
 
 ### Панели дашборда
 
@@ -239,13 +239,13 @@ kubectl get secret prometheus-grafana -n monitoring -o jsonpath="{.data.admin-pa
 
 **Алерт на Error Rate:**
 ```promql
-sum(rate(http_server_requests_seconds_count{application="health-service", status="500"}[5m]))
+sum(rate(http_server_requests_seconds_count{application="user-service", status="500"}[5m]))
 ```
 Условие: `IS ABOVE 5`, Evaluation: `1m`, Pending: `5m`.
 
 **Алерт на Latency:**
 ```promql
-histogram_quantile(0.95, sum(rate(http_server_requests_seconds_count{application="health-service"}[5m])) by (le))
+histogram_quantile(0.95, sum(rate(http_server_requests_seconds_count{application="user-service"}[5m])) by (le))
 ```
 Условие: `IS ABOVE 1`, Evaluation: `1m`, Pending: `5m`.
 
@@ -253,7 +253,7 @@ histogram_quantile(0.95, sum(rate(http_server_requests_seconds_count{application
 
 ```bash
 helm install postgres-exporter prometheus-community/prometheus-postgres-exporter \
-  -n health-service \
+  -n user-service \
   -f postgres-exporter-values.yaml
 ```
 
@@ -261,7 +261,7 @@ helm install postgres-exporter prometheus-community/prometheus-postgres-exporter
 ```yaml
 config:
   datasource:
-    host: "postgres-test-postgresql.health-service.svc.cluster.local"
+    host: "postgres-test-postgresql.user-service.svc.cluster.local"
     user: "app_user"
     pass: "securePassword123"
     port: "5432"
@@ -277,7 +277,7 @@ serviceMonitor:
 
 Проверка:
 ```bash
-kubectl port-forward -n health-service svc/postgres-exporter-prometheus-postgres-exporter 9187:80
+kubectl port-forward -n user-service svc/postgres-exporter-prometheus-postgres-exporter 9187:80
 curl -s http://localhost:9187/metrics | grep pg_up
 ```
 
@@ -340,14 +340,14 @@ kubectl get svc -n ingress-nginx
 
 ```bash
 helm install postgres-test oci://registry-1.docker.io/bitnamicharts/postgresql \
-  -n health-service \
+  -n user-service \
   --create-namespace \
   -f values.yaml
 ```
 
 Проверка:
 ```bash
-kubectl get pods -n health-service
+kubectl get pods -n user-service
 ```
 
 ### Развертывание приложения
@@ -369,12 +369,12 @@ kubectl apply -f k8s/ingress.yaml
 
 Проверка статуса миграции:
 ```bash
-kubectl logs -n health-service job/db-migration
+kubectl logs -n user-service job/db-migration
 ```
 
 Проверка таблиц в БД:
 ```bash
-kubectl exec -n health-service pod/postgres-test-postgresql-0 -- \
+kubectl exec -n user-service pod/postgres-test-postgresql-0 -- \
   env PGPASSWORD=securePassword123 psql -U app_user -d app_db -c "\dt"
 ```
 
