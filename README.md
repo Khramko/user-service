@@ -408,7 +408,9 @@ kubectl port-forward -n ingress-nginx svc/nginx-ingress-ingress-nginx-controller
 
 ## API Эндпоинты
 
-Коллекция Postman находится в директории `etc/collection.json`.
+Коллекции Postman находятся в директории `etc/`:
+- `auth-profile-tests.postman_collection.json` — актуальные тесты auth+profile (11 запросов);
+- `collection.json` — legacy CRUD, помечен deprecated.
 
 | Метод | Путь | Описание | Auth |
 |---|---|---|---|
