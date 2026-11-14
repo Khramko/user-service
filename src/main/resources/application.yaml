@@ -43,7 +43,7 @@ management:
 logging:
   level:
     liquibase: INFO
-    com.example.health_service: INFO
+    com.example.user_service: INFO
     org.springframework.web: INFO
 
 security:

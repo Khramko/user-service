@@ -407,15 +407,19 @@ kubectl port-forward -n ingress-nginx svc/nginx-ingress-ingress-nginx-controller
 
 Коллекция Postman находится в директории `etc/collection.json`.
 
-| Метод | Путь | Описание |
-|---|---|---|
-| GET | `/health` | Health check |
-| GET | `/actuator/prometheus` | Метрики в формате Prometheus |
-| GET | `/api/users` | Список пользователей |
-| POST | `/api/users` | Создать пользователя |
-| GET | `/api/users/{id}` | Получить пользователя |
-| PUT | `/api/users/{id}` | Обновить пользователя |
-| DELETE | `/api/users/{id}` | Удалить пользователя |
+| Метод | Путь | Описание | Auth |
+|---|---|---|---|
+| GET | `/health` | Liveness/readiness проба | — |
+| GET | `/actuator/prometheus` | Метрики Prometheus | — |
+| POST | `/auth/register` | Регистрация | — |
+| POST | `/auth/login` | Вход, выдаёт JWT | — |
+| GET | `/api/profile` | Свой профиль | Bearer |
+| PUT | `/api/profile` | Обновить свой профиль | Bearer |
+| GET | `/api/profile/{id}` | Профиль по id (только свой, иначе 403) | Bearer |
+| PUT | `/api/profile/{id}` | Обновить профиль по id (только свой) | Bearer |
+
+> `/api/users/**` — legacy CRUD, закрыт для обычных пользователей (`denyAll`).
+> Коллекция `etc/collection.json` помечена как deprecated.
 
 
 Актуальная коллекция Postman для проверки сценария аутентификации и профиля:
