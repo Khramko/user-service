@@ -8,7 +8,7 @@ kubectl apply -f k8s/logging/kibana.yaml
 kubectl apply -f k8s/logging/fluent-bit-configmap.yaml
 kubectl apply -f k8s/logging/fluent-bit-daemonset.yaml
 
-# Приложение (namespace health-service)
+# Приложение (namespace user-service)
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 kubectl apply -f k8s/service.yaml

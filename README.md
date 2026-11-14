@@ -162,7 +162,7 @@ sequenceDiagram
 ```
     
 
-### Настройка `application.yml`
+### Настройка `application.yaml`
 
 ```yaml
 management:
