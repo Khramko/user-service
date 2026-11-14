@@ -1,5 +1,8 @@
 # User Service
 
+> **Примечание:** GitHub-репозиторий исторически называется `health-service`,
+> но сервис переименован в `user-service` (модуль, образ, namespace, дашборд).
+
 Spring Boot микросервис для управления пользователями с интеграцией PostgreSQL, Liquibase для миграций и полным набором Kubernetes манифестов для развертывания. Включает полный стек мониторинга: Prometheus, Grafana и алертинг.
 
 ## 📋 Оглавление
@@ -436,6 +439,8 @@ kubectl port-forward -n ingress-nginx svc/nginx-ingress-ingress-nginx-controller
 ```bash
 newman run etc/auth-profile-tests.postman_collection.json \
   --env-var "baseUrl=http://arch.homework:8080"
+```
+
 > **Logout:** не реализован на бэкенде, т.к. используется stateless JWT.
 > Клиент удаляет токен локально (из localStorage/памяти) — этого достаточно
 > для завершения сессии.

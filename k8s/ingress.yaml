@@ -25,7 +25,21 @@ spec:
                 name: user-service
                 port:
                   number: 8000
-          - path: /auth/.*
+                    - path: /api/profile
+            pathType: Prefix
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8000
+          - path: /api/profile/.*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8000
+- path: /auth/.*
             pathType: ImplementationSpecific
             backend:
               service:
